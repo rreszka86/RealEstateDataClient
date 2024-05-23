@@ -1,5 +1,6 @@
 import { useState } from "react"
 import axios from "axios"
+import { useNavigate } from "react-router-dom"
 
 function Login() {
 
@@ -10,6 +11,8 @@ function Login() {
     const [error, setError] = useState(false)
 
     const ipAddress = "http://localhost:8080"
+
+    const navigate = useNavigate()
 
     const handleEmail = (e) => {
         setEmail(e.target.value)
@@ -28,21 +31,28 @@ function Login() {
         } else {
             setSubmitted(true)
             setError(false)
-            postRegister()
+            postLogin()
         }
     }
 
-    const postRegister = () => {
-        axios.post(ipAddress + "/api/auth/authenticate", {
+    const postLogin = async () => {
+        var isLogged = false;
+        await axios.post(ipAddress + "/api/auth/authenticate", {
             email: email,
             password: passwd
         })
         .then(function (res) {
             console.log(res)
+            localStorage.setItem('jwtToken', res.data.token);
+            isLogged = true;
         })
         .catch(function (error) {
             console.log(error)
         })
+
+        if (isLogged){
+            navigate("/main");
+        }
     }
 
     const alert = () => {

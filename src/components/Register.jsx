@@ -39,7 +39,7 @@ function Register(){
     }
 
     const postRegister = async () => {
-        axios.post(ipAddress + "/api/auth/register", {
+        await axios.post(ipAddress + "/api/auth/register", {
             email: email,
             password: passwd
         })
@@ -67,7 +67,7 @@ function Register(){
                     display: submitted ? "" : "none", 
                 }} 
             > 
-                <strong>Użytkownik {email} został zarejestrowany</strong> 
+                <strong>Użytkownik {email} został zarejestrowany, możesz przejść do strony logowania</strong> 
             </div> 
         ); 
     }; 
@@ -135,6 +135,7 @@ function Register(){
                         </div>
                         <div class="mb-3">
                             <button type="submit" class="btn btn-primary" onClick={handleSubmit}>Zarejestruj</button>
+                            <a class="btn btn-primary float-end" href="/login">Przejdź do logowania</a>
                         </div>
                     </form>
                 </div>

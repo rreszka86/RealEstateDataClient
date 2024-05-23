@@ -60,8 +60,7 @@ function Register(){
     const successMessage = () => { 
         return ( 
             <div 
-                className="success"
-                class="alert alert-success alert-dismissible fade show"
+                className="success alert alert-success alert-dismissible fade show"
                 role="alert"
                 style={{ 
                     display: submitted ? "" : "none", 
@@ -75,8 +74,7 @@ function Register(){
     const errorMessage = () => { 
         return ( 
             <div 
-                className="error"
-                class="alert alert-danger alert-dismissible fade show"
+                className="error alert alert-danger alert-dismissible fade show"
                 role="alert"
                 style={{ 
                     display: error ? "" : "none", 
@@ -90,10 +88,10 @@ function Register(){
 
 
     return (
-        <div class="container mt-5">
-            <div class="row justify-content-center align-items-center">
-                <div class="col-sm-12 col-md-12 col-lg-4">
-                    <h1 class="mb-3">Rejestracja</h1>
+        <div className="container mt-5">
+            <div className="row justify-content-center align-items-center">
+                <div className="col-sm-12 col-md-12 col-lg-4">
+                    <h1 className="mb-3">Rejestracja</h1>
                     <form method="post" onSubmit={(e) => {
 
                     }}>
@@ -103,39 +101,39 @@ function Register(){
                         <div className="messages">
                             {successMessage()}
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Adres Email</label>
+                        <div className="mb-3">
+                            <label className="form-label">Adres Email</label>
                             <input 
                                 type="text" 
-                                class="form-control"
+                                className="form-control"
                                 onChange={handleEmail}
                                 value={email}
                             />
-                            <span class="text-danger"></span>
+                            <span className="text-danger"></span>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Hasło</label>
+                        <div className="mb-3">
+                            <label className="form-label">Hasło</label>
                             <input 
                                 type="password"
-                                class="form-control"
+                                className="form-control"
                                 onChange={handlePasswd}
                                 value={passwd}
                             />
-                            <span class="text-danger"></span>
+                            <span className="text-danger"></span>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Powtórz hasło</label>
+                        <div className="mb-3">
+                            <label className="form-label">Powtórz hasło</label>
                             <input
                                 type="password"
-                                class="form-control"
+                                className="form-control"
                                 onChange={handleRepeatPasswd}
                                 value={repeatPasswd}
                             />
-                            <span class="text-danger"></span>
+                            <span className="text-danger"></span>
                         </div>
-                        <div class="mb-3">
-                            <button type="submit" class="btn btn-primary" onClick={handleSubmit}>Zarejestruj</button>
-                            <a class="btn btn-primary float-end" href="/login">Przejdź do logowania</a>
+                        <div className="mb-3">
+                            <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Zarejestruj</button>
+                            <a className="btn btn-primary float-end" href="/login">Przejdź do logowania</a>
                         </div>
                     </form>
                 </div>

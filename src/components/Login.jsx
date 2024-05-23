@@ -57,47 +57,47 @@ function Login() {
 
     const alert = () => {
         return (
-            <div class="alert alert-warning alert-dismissible fade show" role="alert" style={{ display: error ? "" : "none", }} >
+            <div className="alert alert-warning alert-dismissible fade show" role="alert" style={{ display: error ? "" : "none", }} >
                 <strong>Login lub hasło niepoprawne</strong>
             </div>
         )
     }
 
     return (
-        <div class="containter mt-5">
-            <div class="row justify-content-center align-items-center">
-                <div class="col-sm-12 col-md-12 col-lg-4">
-                    <h1 class="mb-3">Login</h1>
+        <div className="containter mt-5">
+            <div className="row justify-content-center align-items-center">
+                <div className="col-sm-12 col-md-12 col-lg-4">
+                    <h1 className="mb-3">Login</h1>
                     <div className="message">
                         {alert()}
                     </div>
                     <form method="post">
-                        <div class="mb-3">
-                            <label class="form-label">Adres Email</label>
+                        <div className="mb-3">
+                            <label className="form-label">Adres Email</label>
                             <input
                                 type="text"
-                                class="form-control"
+                                className="form-control"
                                 onChange={handleEmail}
                                 value={email}
                             />
-                            <span class="text-danger"></span>
+                            <span className="text-danger"></span>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Hasło</label>
+                        <div className="mb-3">
+                            <label className="form-label">Hasło</label>
                             <input
                                 type="password"
-                                class="form-control"
+                                className="form-control"
                                 onChange={handlePasswd}
                                 value={passwd}
                             />
-                            <span class="text-danger"></span>
+                            <span className="text-danger"></span>
                         </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" />
-                            <label class="form-check-label">Zapamiętaj mnie</label>
+                        <div className="mb-3 form-check">
+                            <input type="checkbox" className="form-check-input" />
+                            <label className="form-check-label">Zapamiętaj mnie</label>
                         </div>
-                        <div class="mb-3">
-                            <button type="submit" class="btn btn-primary" onClick={handleSubmit}>Zaloguj</button>
+                        <div className="mb-3">
+                            <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Zaloguj</button>
                         </div>
                     </form>
                 </div>

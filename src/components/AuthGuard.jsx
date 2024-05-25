@@ -9,12 +9,13 @@ const AuthGuard = () => {
 	const [isLoading, setIsLoading] = useState(true);
 
 	const validateToken = async () => {
-		const ipAddress = "http://localhost:8080";
-
 		try {
-			const res = await axios.get(ipAddress + "/api/auth/validate", {
-				headers: { Authorization: `Bearer ${token}` },
-			});
+			const res = await axios.get(
+				import.meta.env.VITE_API_SERVER_ADDRESS + "/api/auth/validate",
+				{
+					headers: { Authorization: `Bearer ${token}` },
+				}
+			);
 
 			console.log("Token verification status: " + res.data);
 			setAuthStatus(res.data);

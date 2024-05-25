@@ -10,12 +10,13 @@ function Main() {
 	const [region, setRegion] = useState("LUBELSKIE");
 
 	const getData = async () => {
-		const ipAddress = "http://localhost:8080";
 		const token = localStorage.getItem("jwtToken");
 
 		try {
 			const res = await axios.get(
-				`${ipAddress}/api/housingPrices/?name=${region}&transaction=rynek wtórny&surface=od 40,1 do 60 m2`,
+				`${
+					import.meta.env.VITE_API_SERVER_ADDRESS
+				}/api/housingPrices/?name=${region}&transaction=rynek wtórny&surface=od 40,1 do 60 m2`,
 				{
 					headers: { Authorization: `Bearer ${token}` },
 				}

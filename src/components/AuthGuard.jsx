@@ -1,40 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
-import Main from "./Main"
-
+import Main from "./Main";
 
 const AuthGuard = () => {
-    const token = localStorage.getItem('jwtToken');
-    const [ authStatus, setAuthStatus ] = useState(false);
-    const [ isLoading, setIsLoading ] = useState(true);
-    
-    const validate = async () => {
-        const ipAddress = "http://localhost:8080"
-        
-        try{
-            const res = await axios.get(ipAddress + "/api/auth/validate", {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+	const token = localStorage.getItem("jwtToken");
+	const [authStatus, setAuthStatus] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 
-            console.log("Token verification status: " + res.data);
-            setAuthStatus(res.data);
-            setIsLoading(false);
-        } catch(err){
-            console.log(err);
-            setIsLoading(false);
-        }
-    }
+	const validateToken = async () => {
+		const ipAddress = "http://localhost:8080";
 
-    useEffect(() => {
-        validate();
-    }, [token]);
+		try {
+			const res = await axios.get(ipAddress + "/api/auth/validate", {
+				headers: { Authorization: `Bearer ${token}` },
+			});
 
+			console.log("Token verification status: " + res.data);
+			setAuthStatus(res.data);
+			setIsLoading(false);
+		} catch (err) {
+			console.log(err);
+			setIsLoading(false);
+		}
+	};
 
-    if (isLoading){
-        return <p>Loading</p>;
-    }
-    return authStatus ? <Main/> : <Navigate to="/login"></Navigate>;
-}
+	useEffect(() => {
+		validateToken();
+	}, [token]);
 
-export default AuthGuard
+	if (isLoading) {
+		return <p>Loading</p>;
+	}
+	return authStatus ? <Main /> : <Navigate to="/login"></Navigate>;
+};
+
+export default AuthGuard;

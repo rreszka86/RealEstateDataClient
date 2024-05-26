@@ -12,14 +12,16 @@ function Main() {
     const [chartData, setChartData] = useState(null);
     const [isLoadingHousing, setIsLoadingHousing] = useState(true);
     const [isLoadingInterests, setIsLoadingInterests] = useState(true);
-    const [region, setRegion] = useState("LUBELSKIE");
+    const [region, setRegion] = useState("POLSKA");
+    const [market, setMarket] = useState("rynek pierwotny")
+    const [type, setType] = useState("do 40 m2")
 
     useEffect(() => {
-        dataService.getHousingData(region).then((data) => {
+        dataService.getHousingData(region, market, type).then((data) => {
             setHousingData(data)
             setIsLoadingHousing(false)
         })
-    }, [region]);
+    }, [region, market, type]);
 
     useEffect(() => {
         dataService.getRatesData().then((data) => {
@@ -85,7 +87,7 @@ function Main() {
 
     return (
         <div>
-            <Menu region={region} setRegion={setRegion}></Menu>
+            <Menu region={region} setRegion={setRegion} market={market} setMarket={setMarket} type={type} setType={setType}></Menu>
             <div className="chartCard">
                 <div className="chartBox">
                     {chartData ? <LinearChart chartData={chartData} /> : <p></p>}

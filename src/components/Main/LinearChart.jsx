@@ -13,6 +13,9 @@ function LinearChart({ chartData }) {
             title: {
                 display: true,
                 text: 'Zestawienie cen mieszkań oraz stóp procentowych z ostatnich 10 lat',
+                font:{
+                    size: 16
+                }
             },
         },
         scales: {
@@ -20,6 +23,13 @@ function LinearChart({ chartData }) {
                 type: 'linear',
                 display: true,
                 position: 'left',
+                title: {
+                    display: true,
+                    text: 'Średnia cena mieszkania w (zł)',
+                    font: {
+                        size: 16,
+                    }
+                }
             },
             y1: {
                 type: 'linear',
@@ -28,6 +38,13 @@ function LinearChart({ chartData }) {
                 grid: {
                     drawOnChartArea: false,
                 },
+                title: {
+                    display: true,
+                    text: 'Wartość stóp procentowych wyrażona w (%)',
+                    font: {
+                        size: 16
+                    }
+                }
             },
         },
     };

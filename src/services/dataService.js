@@ -4,10 +4,10 @@ export default class dataService {
     static ipAddress = import.meta.env.VITE_API_SERVER_ADDRESS;
     static token = localStorage.getItem("jwtToken");
 
-    static getHousingData = async (region) => {
+    static getHousingData = async (region, market, type) => {
         try {
             const res = await axios.get(
-                `${this.ipAddress}/api/housingPrices/?name=${region}&transaction=rynek wtórny&surface=od 40,1 do 60 m2`,
+                `${this.ipAddress}/api/housingPrices/?name=${region}&transaction=${market}&surface=${type}`,
                 {
                     headers: { Authorization: `Bearer ${this.token}` },
                 }

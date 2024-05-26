@@ -21,6 +21,11 @@ const ChartNav = ({ region, setRegion, market, setMarket, type, setType}) => {
 		setType(eventkey)
 	}
 
+	const handleLogout = () => {
+		localStorage.removeItem("jwtToken")
+		window.location.reload()
+	}
+
 	return (
 		<Navbar bg="primary" data-bs-theme="dark" className="bg-body-tertiary">
 			<Container>
@@ -56,7 +61,7 @@ const ChartNav = ({ region, setRegion, market, setMarket, type, setType}) => {
 					</NavDropdown>
 					</Nav>
 					<Nav>
-						<Button variant="outline-light" href="/logout">
+						<Button variant="outline-light" onClick={handleLogout}>
 							Wyloguj się
 						</Button>
 					</Nav>

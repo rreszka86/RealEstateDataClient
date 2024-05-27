@@ -4,7 +4,7 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
 
-const ChartNav = ({ region, setRegion, market, setMarket, type, setType}) => {
+const ChartNav = ({ region, setRegion, market, setMarket, type, setType, data}) => {
 	const toUpper = (string) => {
 		return string.toUpperCase()
 	}
@@ -24,6 +24,16 @@ const ChartNav = ({ region, setRegion, market, setMarket, type, setType}) => {
 	const handleLogout = () => {
 		localStorage.removeItem("jwtToken")
 		window.location.reload()
+	}
+
+	const handleExport = () => {
+		const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+			JSON.stringify(data)
+		)}`
+		const link = document.createElement("a")
+		link.href = jsonString
+		link.download = "data.json"
+		link.click()
 	}
 
 	return (
@@ -61,6 +71,9 @@ const ChartNav = ({ region, setRegion, market, setMarket, type, setType}) => {
 					</NavDropdown>
 					</Nav>
 					<Nav>
+						<Button variant="outline-light" onClick={handleExport}>
+							Eksport
+						</Button>
 						<Button variant="outline-light" onClick={handleLogout}>
 							Wyloguj się
 						</Button>

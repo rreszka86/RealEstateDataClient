@@ -107,6 +107,8 @@ function Main() {
     }
   }, [isLoadingHousing, isLoadingInterests, housingData, ratesData]);
 
+
+
   return (
     <div>
       <Menu
@@ -116,6 +118,7 @@ function Main() {
         setMarket={setMarket}
         type={type}
         setType={setType}
+        data={housingData}
       ></Menu>
       <div className="chartCard">
         <div className="chartBox">

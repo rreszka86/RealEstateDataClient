@@ -1,6 +1,5 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 function Login() {
 	const [email, setEmail] = useState("");
@@ -8,8 +7,6 @@ function Login() {
 
 	const [submitted, setSubmitted] = useState(false);
 	const [error, setError] = useState(false);
-
-	const navigate = useNavigate();
 
 	const handleEmail = (e) => {
 		setEmail(e.target.value);
@@ -33,7 +30,6 @@ function Login() {
 	};
 
 	const postLogin = async () => {
-		var isLogged = false;
 		await axios
 			.post(
 				import.meta.env.VITE_API_SERVER_ADDRESS + "/api/auth/authenticate",
@@ -45,15 +41,11 @@ function Login() {
 			.then(function (res) {
 				console.log(res);
 				localStorage.setItem("jwtToken", res.data.token);
-				isLogged = true;
+				window.location.reload()
 			})
 			.catch(function (error) {
 				console.log(error);
 			});
-
-		if (isLogged) {
-			navigate("/main");
-		}
 	};
 
 	const alert = () => {

@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 const AuthGuard = (props) => {
-  const token = localStorage.getItem("jwtToken");
   const [authStatus, setAuthStatus] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const validateToken = async () => {
+  const validateToken = async (token) => {
+	if(!token){
+		setIsLoading(false)
+		return
+	}
     try {
       const res = await axios.get(
         import.meta.env.VITE_API_SERVER_ADDRESS + "/api/auth/validate",
@@ -14,19 +17,19 @@ const AuthGuard = (props) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
       console.log("Token verification status: " + res.data);
       setAuthStatus(res.data);
-      setIsLoading(false);
     } catch (err) {
-      console.log(err);
-      setIsLoading(false);
-    }
+      console.log(err);	  
+    } finally {
+		setIsLoading(false)
+	}
   };
 
   useEffect(() => {
-    validateToken();
-  }, [token]);
+	const token = localStorage.getItem("jwtToken")
+	validateToken(token)
+  }, []);
 
   if (isLoading) {
     return <p>Loading...</p>;

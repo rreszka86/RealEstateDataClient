@@ -1,14 +1,15 @@
 import { useState } from "react";
 import axios from "axios";
+import userService from "../services/userService";
 
 function Register() {
 	const [email, setEmail] = useState("");
 	const [passwd, setPasswd] = useState("");
 	const [repeatPasswd, setRepeatPasswd] = useState("");
-	const [message, setMessage] = useState("Uzupełnij wszystkie pola");
-
+	const [message, setMessage] = useState();
 	const [submitted, setSubmitted] = useState(false);
 	const [error, setError] = useState(false);
+	const [validateErrors, setValidateErrors] = useState([]);
 
 	const handleEmail = (e) => {
 		setEmail(e.target.value);
@@ -27,12 +28,17 @@ function Register() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		if (
-			(email == "" && passwd == "" && repeatPasswd == "") ||
-			passwd != repeatPasswd
-		) {
+
+		setError(false);
+
+		const validationResult = userService.validateRegisterData(email, passwd, repeatPasswd);
+
+		if (!validationResult.length == 0) {
+			setMessage("Formularz został niepoprawnie wypełniony:")
+			setValidateErrors(validationResult);
 			setError(true);
 		} else {
+			setValidateErrors([]);
 			setSubmitted(true);
 			setError(false);
 			postRegister();
@@ -54,7 +60,7 @@ function Register() {
 				if (status == 409) {
 					setError(true);
 					setSubmitted(false);
-					setMessage("Taki użytkownik już istnieje");
+					setMessage("Taki użytkownik już istnieje!");
 				}
 			});
 	};
@@ -70,7 +76,7 @@ function Register() {
 			>
 				<strong>
 					Użytkownik {email} został zarejestrowany, możesz przejść do strony
-					logowania
+					logowania.
 				</strong>
 			</div>
 		);
@@ -85,7 +91,12 @@ function Register() {
 					display: error ? "" : "none",
 				}}
 			>
-				<strong>{message}</strong>
+				<strong>Formularz został niepoprawnie wypełniony:</strong>
+				<ul>
+					{validateErrors.map((error) => (
+                  <li>{error}</li>
+                ))}
+				</ul>
 			</div>
 		);
 	};

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import userService from "../services/userService";
 
 function Login() {
 	const [email, setEmail] = useState("");
@@ -7,6 +8,9 @@ function Login() {
 
 	const [submitted, setSubmitted] = useState(false);
 	const [error, setError] = useState(false);
+
+	const [message, setMessage] = useState("")
+	const [validateErrors, setValidateErrors] = useState([])
 
 	const handleEmail = (e) => {
 		setEmail(e.target.value);
@@ -20,12 +24,17 @@ function Login() {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		if (email == "" && passwd == "") {
+		setError(false);
+		const validationResult = userService.validateLoginData(email, passwd)
+		if (!validationResult.length == 0) {
 			setError(true);
+			setMessage("Formularz został niepoprawnie wypełniony.")
+			setValidateErrors(validationResult)
 		} else {
 			setSubmitted(true);
 			setError(false);
 			postLogin();
+			setValidateErrors([])
 		}
 	};
 
@@ -45,17 +54,26 @@ function Login() {
 			})
 			.catch(function (error) {
 				console.log(error);
+				if(error.toJSON().status == 403){
+					setMessage("Nie ma takiego użytkownika!")
+					setError(true);
+				}
 			});
 	};
 
 	const alert = () => {
 		return (
 			<div
-				className="alert alert-warning alert-dismissible fade show"
+				className="alert alert-danger alert-dismissible fade show"
 				role="alert"
 				style={{ display: error ? "" : "none" }}
 			>
-				<strong>Login lub hasło niepoprawne</strong>
+				<strong>{message}</strong>
+				<ul>
+					{validateErrors.map((error) => (
+                  <li>{error}</li>
+                ))}
+				</ul>
 			</div>
 		);
 	};

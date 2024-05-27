@@ -1,5 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
 import userService from "../services/userService";
 
 function Login() {
@@ -28,37 +27,24 @@ function Login() {
 		const validationResult = userService.validateLoginData(email, passwd)
 		if (!validationResult.length == 0) {
 			setError(true);
-			setMessage("Formularz został niepoprawnie wypełniony.")
-			setValidateErrors(validationResult)
+			setMessage("Formularz został niepoprawnie wypełniony.");
+			setValidateErrors(validationResult);
 		} else {
 			setSubmitted(true);
 			setError(false);
-			postLogin();
-			setValidateErrors([])
-		}
-	};
-
-	const postLogin = async () => {
-		await axios
-			.post(
-				import.meta.env.VITE_API_SERVER_ADDRESS + "/api/auth/authenticate",
-				{
-					email: email,
-					password: passwd,
-				}
-			)
-			.then(function (res) {
-				console.log(res);
-				localStorage.setItem("jwtToken", res.data.token);
-				window.location.reload()
-			})
-			.catch(function (error) {
-				console.log(error);
-				if(error.toJSON().status == 403){
-					setMessage("Nie ma takiego użytkownika!")
+			userService.postLogin(email, passwd).then((res) => {
+				console.log("User logged")
+				localStorage.setItem("jwtToken", res.token);
+				window.location.reload();
+			}).catch((err) => {
+				console.log(err);
+				if(err.toJSON().status == 403){
+					setMessage("Nieprawidłowy email lub hasło!")
 					setError(true);
 				}
 			});
+			setValidateErrors([]);
+		}
 	};
 
 	const alert = () => {

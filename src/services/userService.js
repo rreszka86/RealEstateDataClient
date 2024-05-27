@@ -1,4 +1,8 @@
+import axios from "axios";
+
 export default class userService{
+    static ipAddress = import.meta.env.VITE_API_SERVER_ADDRESS;
+
     static validateRegisterData(email, passwd, repeatPasswd){
         let errors = [];
         
@@ -35,4 +39,53 @@ export default class userService{
 
         return errors;
     }
+
+    static postLogin = async (email, passwd) => {
+        try{
+            const res = await axios
+			.post(
+				this.ipAddress + "/api/auth/authenticate",
+				{
+					email: email,
+					password: passwd,
+				}
+			);
+            console.log(res);
+            return res.data;
+        } catch (error){
+            console.log(error)
+            throw error;
+        }
+	};
+
+    static postRegister = async (email, passwd) => {
+        try{
+            const res = await axios
+			.post(this.ipAddress + "/api/auth/register", {
+				email: email,
+				password: passwd,
+			});
+            console.log(res);
+            return res.data;
+        } catch(error){
+            console.log(error);
+            throw error;
+        }
+	};
+
+    static validateToken = async (token) => {
+        try {
+          const res = await axios.get(
+            this.ipAddress + "/api/auth/validate",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          console.log("Token verification status: " + res.data);
+          return res.data;
+        } catch (err) {
+          console.log(err); 
+          throw err;
+        }
+      };
 }

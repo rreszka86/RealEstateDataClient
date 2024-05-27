@@ -1,5 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
 import userService from "../services/userService";
 
 function Register() {
@@ -41,28 +40,19 @@ function Register() {
 			setValidateErrors([]);
 			setSubmitted(true);
 			setError(false);
-			postRegister();
-		}
-	};
-
-	const postRegister = async () => {
-		await axios
-			.post(import.meta.env.VITE_API_SERVER_ADDRESS + "/api/auth/register", {
-				email: email,
-				password: passwd,
-			})
-			.then(function (res) {
-				console.log(res);
-			})
-			.catch(function (error) {
-				const status = error.toJSON().status;
-				console.log(error);
+			userService.postRegister(email, passwd).then((res) => {
+				console.log("User registered");
+			}).catch((err) => {
+				const status = err.toJSON().status;
+				console.log(err);
 				if (status == 409) {
 					setError(true);
 					setSubmitted(false);
 					setMessage("Taki użytkownik już istnieje!");
 				}
-			});
+			})
+			setValidateErrors([])
+		}
 	};
 
 	const successMessage = () => {
@@ -91,7 +81,7 @@ function Register() {
 					display: error ? "" : "none",
 				}}
 			>
-				<strong>Formularz został niepoprawnie wypełniony:</strong>
+				<strong>{message}</strong>
 				<ul>
 					{validateErrors.map((error) => (
                   <li>{error}</li>

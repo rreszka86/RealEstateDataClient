@@ -118,7 +118,8 @@ function Main() {
         setMarket={setMarket}
         type={type}
         setType={setType}
-        data={housingData}
+        dataHousing={housingData}
+        dataRates={ratesData}
       ></Menu>
       <div className="chartCard">
         <div className="chartBox">

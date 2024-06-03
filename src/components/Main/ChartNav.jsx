@@ -84,6 +84,7 @@ return (
 					size="md"
 					variant="outline-light"
 					title="Eksportuj"
+					className="me-1"
 					onSelect={handleExport}
 				>
 					<Dropdown.Item eventKey="housingData" active={false} >Dane mieszkaniowe</Dropdown.Item>

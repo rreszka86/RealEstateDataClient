@@ -65,7 +65,7 @@ function Login() {
 	};
 
 	return (
-		<div className="containter mt-5">
+		<div className="container mt-5">
 			<div className="row justify-content-center align-items-center">
 				<div className="col-sm-12 col-md-12 col-lg-4">
 					<h1 className="mb-3">Login</h1>

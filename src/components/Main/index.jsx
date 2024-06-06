@@ -268,6 +268,7 @@ function Main() {
         type={type}
         setType={setType}
         dataHousing={housingData}
+        dataBarChart={barChartData}
         dataRates={ratesData}
         pickedOption={pickedOption}
         setPickedOption={setPickedOption}

@@ -9,7 +9,7 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import ListGroup from 'react-bootstrap/ListGroup';
 import { useState } from "react";
 
-const ChartNav = ({ region, setRegion, market, setMarket, type, setType, dataHousing, dataRates, pickedOption, setPickedOption, year, setYear}) => {
+const ChartNav = ({ region, setRegion, market, setMarket, type, setType, dataHousing, dataRates, pickedOption, setPickedOption, year, setYear, dataBarChart}) => {
 	const [showOffcanvas, setShowOffcanvas] = useState(false);
 
 	const toUpper = (string) => {
@@ -39,19 +39,25 @@ const ChartNav = ({ region, setRegion, market, setMarket, type, setType, dataHou
 
 	const handleExport = (eventkey) => {
 		let jsonString
-		if (eventkey == "housingData") {
-			jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-				JSON.stringify(dataHousing)
+		if(pickedOption != "barChart"){
+			if (eventkey == "housingData") {
+				jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+					JSON.stringify(dataHousing)
+				)}`
+			} else {
+				jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+					JSON.stringify(dataRates)
 			)}`
+			}
 		} else {
 			jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-				JSON.stringify(dataRates)
-		)}`
-	}
-		const link = document.createElement("a")
-		link.href = jsonString
-		link.download = "data.json"
-		link.click()
+				JSON.stringify(dataBarChart)
+			)}`
+		}
+	const link = document.createElement("a")
+	link.href = jsonString
+	link.download = "data.json"
+	link.click()
 	}
 
 	const handleOpenOffcanvas = () => setShowOffcanvas(true);
@@ -130,7 +136,7 @@ return (
 					onSelect={handleExport}
 				>
 					<Dropdown.Item eventKey="housingData" active={false} >Dane mieszkaniowe</Dropdown.Item>
-					<Dropdown.Item eventKey="ratesData" active={false}>Dane stóp procentowych</Dropdown.Item>
+					{pickedOption != "barChart" ? <Dropdown.Item eventKey="ratesData" active={false}>Dane stóp procentowych</Dropdown.Item> : ""}
 				</DropdownButton>
 				<Button variant="outline-light" onClick={handleLogout}>
 					Wyloguj się

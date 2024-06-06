@@ -6,19 +6,33 @@ import "./LinearChart.css";
 
 function Main() {
   const [housingData, setHousingData] = useState([]);
+  const [secondaryHousingData, setSecondaryHousingData] = useState([]);
   const [ratesData, setRatesData] = useState([]);
   const [chartData, setChartData] = useState(null);
   const [isLoadingHousing, setIsLoadingHousing] = useState(true);
+  const [isLoadingSecondaryHousing, setIsLoadingSecondaryHousing] = useState(true);
   const [isLoadingInterests, setIsLoadingInterests] = useState(true);
   const [region, setRegion] = useState("POLSKA");
   const [market, setMarket] = useState("rynek pierwotny");
   const [type, setType] = useState("do 40 m2");
 
   useEffect(() => {
+    if(market == "oba rynki"){
+      dataService.getHousingData(region, "rynek pierwotny", type).then((data) => {
+        setHousingData(data);
+        setIsLoadingSecondaryHousing(false);
+      });
+      dataService.getHousingData(region, "rynek wtórny", type).then((data) => {
+        setSecondaryHousingData(data);
+        setIsLoadingHousing(false);
+      });
+    } else {
     dataService.getHousingData(region, market, type).then((data) => {
       setHousingData(data);
+      setSecondaryHousingData([]);
       setIsLoadingHousing(false);
     });
+  }
   }, [region, market, type]);
 
   useEffect(() => {
@@ -75,11 +89,30 @@ function Main() {
         interestRates
       );
 
+      let firstLabel = "Ceny mieszkań";
+      let secondaryLabel = "";
+      let isBothDataPicked = false;
+      let secondaryHousingPrices = [];
+      let mappedSecondaryHousingPrices = [];
+
+      if(market == "oba rynki" && !isLoadingSecondaryHousing ){
+        firstLabel = "Ceny mieszkań - rynek pierwotny";
+        secondaryLabel = "Ceny mieszkań - rynek wtórny";
+        isBothDataPicked = true;
+        secondaryHousingPrices = secondaryHousingData.map((d) => d.price);
+        mappedSecondaryHousingPrices = mapDataToDates(
+          allDates,
+          housingDates,
+          secondaryHousingPrices,
+          true
+        );
+      }
+
       const parsedData = {
         labels: allDates,
         datasets: [
           {
-            label: "Ceny mieszkań",
+            label: firstLabel,
             data: mappedHousingPrices.map((d) =>
               d.isFullYear ? d.value : null
             ),
@@ -87,6 +120,18 @@ function Main() {
             yAxisID: "y",
             backgroundColor: "rgba(54, 162, 235, 0.2)",
             borderColor: "rgba(54, 162, 235, 1)",
+            borderWidth: 1,
+          },
+          {
+            label: secondaryLabel,
+            hidden: !isBothDataPicked,
+            data: mappedSecondaryHousingPrices.map((d) =>
+              d.isFullYear ? d.value : null
+            ),
+            borderDash: [5, 5],
+            yAxisID: "y",
+            backgroundColor: "rgba(143, 80, 255, 0.2)",
+            borderColor: "rgba(143, 80, 255, 1)",
             borderWidth: 1,
           },
           {
@@ -105,7 +150,7 @@ function Main() {
       parsedData.datasets[0].data.pop();
       setChartData(parsedData);
     }
-  }, [isLoadingHousing, isLoadingInterests, housingData, ratesData]);
+  }, [isLoadingHousing, isLoadingSecondaryHousing, isLoadingInterests, housingData, ratesData]);
 
 
 
@@ -123,7 +168,7 @@ function Main() {
       ></Menu>
       <div className="chartCard">
         <div className="chartBox">
-          {chartData ? <LinearChart chartData={chartData} /> : <p></p>}
+          {chartData ? <LinearChart chartData={chartData}/> : <p></p>}
         </div>
       </div>
     </div>

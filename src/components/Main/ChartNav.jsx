@@ -71,6 +71,7 @@ return (
 				<NavDropdown title={"Rynek: " + toUpper(market)} onSelect={handleMarketPick}>
 					<NavDropdown.Item eventKey="rynek pierwotny">RYNEK PIERWOTNY</NavDropdown.Item>
 					<NavDropdown.Item eventKey="rynek wtórny">RYNEK WTÓRNY</NavDropdown.Item>
+					<NavDropdown.Item eventKey="oba rynki">OBA RYNKI</NavDropdown.Item>
 				</NavDropdown>
 				<NavDropdown title={"Typ: " + toUpper(type)} onSelect={handleTypePick}>
 					<NavDropdown.Item eventKey="do 40 m2">DO 40 M2</NavDropdown.Item>

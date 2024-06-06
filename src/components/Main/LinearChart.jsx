@@ -38,6 +38,14 @@ function LinearChart({ chartData }) {
           size: 16,
         },
       },
+      legend: {
+        display: true,
+        labels:{
+          filter: function(legendItem, data){
+            return !data.datasets[legendItem.datasetIndex].hidden;
+          }
+        }
+      },
       tooltip: {
         position: "nearest",
       },
@@ -63,7 +71,7 @@ function LinearChart({ chartData }) {
           font: {
             size: 16,
           },
-        },
+        }
       },
       y1: {
         type: "linear",

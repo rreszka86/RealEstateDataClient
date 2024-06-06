@@ -16,7 +16,6 @@ const AuthGuard = (props) => {
 		}).catch((err) => {
 			console.log("Could not validate token.");
 		}).finally(() => {
-			console.log("dziala??")
 			setIsLoading(false);
 		});
 	}, []);

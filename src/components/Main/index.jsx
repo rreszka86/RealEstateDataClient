@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import LinearChart from "./LinearChart";
+import BarChart from "./BarChart";
 import Menu from "./ChartNav";
 import dataService from "../../services/dataService";
 import "./LinearChart.css";
@@ -8,18 +9,18 @@ function Main() {
   const [housingData, setHousingData] = useState([]);
   const [secondaryHousingData, setSecondaryHousingData] = useState([]);
   const [ratesData, setRatesData] = useState([]);
+  const [barChartData, setBarChartData] = useState([]);
   const [chartData, setChartData] = useState(null);
+  const [barChart, setBarChart] = useState(null);
   const [isLoadingHousing, setIsLoadingHousing] = useState(true);
   const [isLoadingSecondaryHousing, setIsLoadingSecondaryHousing] = useState(true);
   const [isLoadingInterests, setIsLoadingInterests] = useState(true);
+  const [isLoadingBarChartData, setIsLoadingBarChartData] = useState(true);
+  const [year, setYear] = useState(2013);
   const [region, setRegion] = useState("POLSKA");
   const [market, setMarket] = useState("rynek pierwotny");
   const [type, setType] = useState("do 40 m2");
   const [pickedOption, setPickedOption] = useState("linearChart");
-
-  useEffect(() => {
-    console.log(pickedOption)
-  }, [pickedOption])
 
   useEffect(() => {
     if(market == "oba rynki"){
@@ -39,6 +40,13 @@ function Main() {
     });
   }
   }, [region, market, type]);
+
+  useEffect(() => {
+      dataService.getHousingDataForBarChart(year, type).then((data) => {
+        setBarChartData(data);
+        setIsLoadingBarChartData(false);
+      });
+  }, [year, type]);
 
   useEffect(() => {
     dataService.getRatesData().then((data) => {
@@ -119,6 +127,27 @@ function Main() {
     return parsedData
   };
 
+  const parseBarData = (labels, primaryData, afterData) => {
+    return {
+      labels: labels,
+      datasets:
+      [
+        {
+          label: "Średnie ceny mieszkań w (zł) - rynek pierwotny",
+          data: primaryData,
+          backgroundColor: 'rgba(153, 102, 255, 0.2)',
+          borderColor: 'rgba(153, 102, 255, 0.2)',
+        },
+        {
+          label: "Średnie ceny mieszkań w (zł) - rynek wtórny",
+          data: afterData,
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 0.2)',
+        }
+      ]
+    }
+  }
+
   const calculatePercentageChange = (data) =>{
     return data.map((current, index, array) => {
     if (index === 0) return null;
@@ -130,7 +159,7 @@ function Main() {
 }
 
   useEffect(() => {
-    if (!isLoadingHousing && !isLoadingInterests) {
+    if (!isLoadingHousing && !isLoadingInterests && pickedOption != "barChart") {
       const housingDates = housingData.map((d) => `${d.year}-01-01`);
       const interestRateDates = ratesData.map((d) => {
         const [day, month, year] = d.date.split("-");
@@ -203,17 +232,35 @@ function Main() {
 
         parsedData = parseData(allDates, firstLabel, secondaryLabel, mappedHousingPriceChanges, mappedSecondaryHousingPriceChanges, mappedInterestRates, isBothDataPicked);
       }
-      parsedData.labels.pop();
-      parsedData.datasets[0].data.pop();
-      setChartData(parsedData);
+
+      if(pickedOption != "barChart"){
+        parsedData.labels.pop();
+        parsedData.datasets[0].data.pop();
+        setChartData(parsedData);
+      } 
     }
-  }, [isLoadingHousing, isLoadingSecondaryHousing, isLoadingInterests, housingData, ratesData, pickedOption]);
+    if(!isLoadingBarChartData){
+        const primaryMarket = barChartData.filter((d) => d.transaction == "rynek pierwotny")
+        const afterMarket = barChartData.filter((d) => d.transaction == "rynek wtórny")
+        const labels = primaryMarket.map((d) => d.name)
+        const primatyMarketData = primaryMarket.map((d) => d.price)
+        const afterMarketData = afterMarket.map((d) => d.price)
+        if(labels && primatyMarketData && afterMarketData){     
+          const parsedData = parseBarData(labels, primatyMarketData, afterMarketData);
+          setBarChart(parsedData);
+        }
+        
+
+    }
+  }, [isLoadingHousing, isLoadingSecondaryHousing, isLoadingBarChartData, isLoadingInterests, barChartData, housingData, ratesData, pickedOption]);
 
 
 
   return (
     <div>
       <Menu
+        year={year}
+        setYear={setYear}
         region={region}
         setRegion={setRegion}
         market={market}
@@ -222,11 +269,13 @@ function Main() {
         setType={setType}
         dataHousing={housingData}
         dataRates={ratesData}
+        pickedOption={pickedOption}
         setPickedOption={setPickedOption}
       ></Menu>
       <div className="chartCard">
         <div className="chartBox">
           {chartData && (pickedOption == "linearChart" || pickedOption == "percentageChart") ? <LinearChart chartData={chartData} optionsSet={pickedOption}/> : <p></p>}
+          {barChartData && pickedOption == "barChart" ? <BarChart chartData={barChart} optionsSet={pickedOption}/> : <p></p>}
         </div>
       </div>
     </div>

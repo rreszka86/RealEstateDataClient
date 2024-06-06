@@ -9,12 +9,16 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import ListGroup from 'react-bootstrap/ListGroup';
 import { useState } from "react";
 
-const ChartNav = ({ region, setRegion, market, setMarket, type, setType, dataHousing, dataRates, setPickedOption}) => {
+const ChartNav = ({ region, setRegion, market, setMarket, type, setType, dataHousing, dataRates, pickedOption, setPickedOption, year, setYear}) => {
 	const [showOffcanvas, setShowOffcanvas] = useState(false);
 
 	const toUpper = (string) => {
 		return string.toUpperCase()
 	}
+
+	const handleYearPick = (eventKey) => {
+		setYear(eventKey);
+	};
 
 	const handleRegionPick = (eventKey) => {
 		setRegion(eventKey);
@@ -64,6 +68,7 @@ return (
 		</Button>
 		<Container>
 			<Navbar.Brand>Ustawienia</Navbar.Brand>
+			{pickedOption != "barChart" ? 
 			<Nav className="me-auto">
 				<NavDropdown title={"Region: " + region} onSelect={handleRegionPick}>
 					<NavDropdown.Item eventKey="POLSKA">POLSKA</NavDropdown.Item>
@@ -94,7 +99,28 @@ return (
 					<NavDropdown.Item eventKey="od 60,1 do 80 m2">OD 60,1 DO 80 M2</NavDropdown.Item>
 					<NavDropdown.Item eventKey="od 80,1 m2">OD 80,1 M2</NavDropdown.Item>
 				</NavDropdown>
+			</Nav> : 
+			<Nav className="me-auto">
+				<NavDropdown title={"Rok: " + year} onSelect={handleYearPick}>
+					<NavDropdown.Item eventKey="2013">2013</NavDropdown.Item>
+					<NavDropdown.Item eventKey="2014">2014</NavDropdown.Item>
+					<NavDropdown.Item eventKey="2015">2015</NavDropdown.Item>
+					<NavDropdown.Item eventKey="2016">2016</NavDropdown.Item>
+					<NavDropdown.Item eventKey="2017">2017</NavDropdown.Item>
+					<NavDropdown.Item eventKey="2018">2018</NavDropdown.Item>
+					<NavDropdown.Item eventKey="2019">2019</NavDropdown.Item>
+					<NavDropdown.Item eventKey="2020">2020</NavDropdown.Item>
+					<NavDropdown.Item eventKey="2021">2021</NavDropdown.Item>
+					<NavDropdown.Item eventKey="2022">2022</NavDropdown.Item>
+				</NavDropdown>
+				<NavDropdown title={"Typ: " + toUpper(type)} onSelect={handleTypePick}>
+					<NavDropdown.Item eventKey="do 40 m2">DO 40 M2</NavDropdown.Item>
+					<NavDropdown.Item eventKey="od 40,1 do 60 m2">OD 40,1 DO 60 M2</NavDropdown.Item>
+					<NavDropdown.Item eventKey="od 60,1 do 80 m2">OD 60,1 DO 80 M2</NavDropdown.Item>
+					<NavDropdown.Item eventKey="od 80,1 m2">OD 80,1 M2</NavDropdown.Item>
+				</NavDropdown>
 			</Nav>
+			}
 			<Nav>
 				<DropdownButton
 					size="md"

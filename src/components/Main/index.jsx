@@ -15,6 +15,11 @@ function Main() {
   const [region, setRegion] = useState("POLSKA");
   const [market, setMarket] = useState("rynek pierwotny");
   const [type, setType] = useState("do 40 m2");
+  const [pickedOption, setPickedOption] = useState("linearChart")
+
+  useEffect(() => {
+    console.log(pickedOption)
+  }, [pickedOption])
 
   useEffect(() => {
     if(market == "oba rynki"){
@@ -66,6 +71,64 @@ function Main() {
     });
   };
 
+  const parseData = (
+    labels,
+    firstLabel,
+    secondLabel,
+    firstData,
+    secondData,
+    thirdData,
+    isBothPicked
+  ) => {
+    const parsedData = {
+      labels: labels,
+      datasets: [
+        {
+          label: firstLabel,
+          data: firstData.map((d) => (d.isFullYear ? d.value : null)),
+          borderDash: [5, 5],
+          yAxisID: "y",
+          backgroundColor: "rgba(54, 162, 235, 0.2)",
+          borderColor: "rgba(54, 162, 235, 1)",
+          borderWidth: 1,
+        },
+        {
+          label: secondLabel,
+          hidden: !isBothPicked,
+          data: secondData.map((d) =>
+            d.isFullYear ? d.value : null
+          ),
+          borderDash: [5, 5],
+          yAxisID: "y",
+          backgroundColor: "rgba(143, 80, 255, 0.2)",
+          borderColor: "rgba(143, 80, 255, 1)",
+          borderWidth: 1,
+        },
+        {
+          label: "Stopy procentowe",
+          data: thirdData.map((d) => d.value),
+          stepped: true,
+          yAxisID: "y1",
+          backgroundColor: "rgba(255, 99, 132, 0.2)",
+          borderColor: "rgba(255, 99, 132, 1)",
+          borderWidth: 1,
+          pointRadius: 0,
+        },
+      ],
+    };
+    return parsedData
+  };
+
+  const calculatePercentageChange = (data) =>{
+    return data.map((current, index, array) => {
+    if (index === 0) return null;
+
+    const previous = array[index - 1];
+    const change = ((current.price - previous.price) / previous.price) * 100;
+    return change.toFixed(2);
+  });
+}
+
   useEffect(() => {
     if (!isLoadingHousing && !isLoadingInterests) {
       const housingDates = housingData.map((d) => `${d.year}-01-01`);
@@ -108,49 +171,43 @@ function Main() {
         );
       }
 
-      const parsedData = {
-        labels: allDates,
-        datasets: [
-          {
-            label: firstLabel,
-            data: mappedHousingPrices.map((d) =>
-              d.isFullYear ? d.value : null
-            ),
-            borderDash: [5, 5],
-            yAxisID: "y",
-            backgroundColor: "rgba(54, 162, 235, 0.2)",
-            borderColor: "rgba(54, 162, 235, 1)",
-            borderWidth: 1,
-          },
-          {
-            label: secondaryLabel,
-            hidden: !isBothDataPicked,
-            data: mappedSecondaryHousingPrices.map((d) =>
-              d.isFullYear ? d.value : null
-            ),
-            borderDash: [5, 5],
-            yAxisID: "y",
-            backgroundColor: "rgba(143, 80, 255, 0.2)",
-            borderColor: "rgba(143, 80, 255, 1)",
-            borderWidth: 1,
-          },
-          {
-            label: "Stopy procentowe",
-            data: mappedInterestRates.map((d) => d.value),
-            stepped: true,
-            yAxisID: "y1",
-            backgroundColor: "rgba(255, 99, 132, 0.2)",
-            borderColor: "rgba(255, 99, 132, 1)",
-            borderWidth: 1,
-            pointRadius: 0,
-          },
-        ],
-      };
+      let parsedData;
+      
+      if(pickedOption == "linearChart"){
+        parsedData = parseData(allDates, firstLabel, secondaryLabel, mappedHousingPrices, mappedSecondaryHousingPrices, mappedInterestRates, isBothDataPicked);
+      }
+
+      if(pickedOption == "percentageChart"){
+        firstLabel = "Zmiany procentowe - rynek pierwotny";
+        secondaryLabel = "Zmiany procentowe - rynek wtórny";
+        const percentageChangeYearly = calculatePercentageChange(housingData);
+        const secondPercentageChangeYearly = calculatePercentageChange(secondaryHousingData);
+
+        percentageChangeYearly.pop();
+        secondPercentageChangeYearly.pop();
+        
+        console.log(percentageChangeYearly)
+        const mappedHousingPriceChanges = mapDataToDates(
+          allDates,
+          housingDates,
+          percentageChangeYearly,
+          true
+        );
+
+        const mappedSecondaryHousingPriceChanges = mapDataToDates(
+          allDates,
+          housingDates,
+          secondPercentageChangeYearly,
+          true
+        );
+
+        parsedData = parseData(allDates, firstLabel, secondaryLabel, mappedHousingPriceChanges, mappedSecondaryHousingPriceChanges, mappedInterestRates, isBothDataPicked);
+      }
       parsedData.labels.pop();
       parsedData.datasets[0].data.pop();
       setChartData(parsedData);
     }
-  }, [isLoadingHousing, isLoadingSecondaryHousing, isLoadingInterests, housingData, ratesData]);
+  }, [isLoadingHousing, isLoadingSecondaryHousing, isLoadingInterests, housingData, ratesData, pickedOption]);
 
 
 
@@ -165,10 +222,11 @@ function Main() {
         setType={setType}
         dataHousing={housingData}
         dataRates={ratesData}
+        setPickedOption={setPickedOption}
       ></Menu>
       <div className="chartCard">
         <div className="chartBox">
-          {chartData ? <LinearChart chartData={chartData}/> : <p></p>}
+          {chartData && (pickedOption == "linearChart" || pickedOption == "percentageChart") ? <LinearChart chartData={chartData} optionsSet={pickedOption}/> : <p></p>}
         </div>
       </div>
     </div>

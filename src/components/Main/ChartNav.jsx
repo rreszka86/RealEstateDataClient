@@ -2,11 +2,16 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import Offcanvas from 'react-bootstrap/Offcanvas';
 import Button from "react-bootstrap/Button";
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
+import ListGroup from 'react-bootstrap/ListGroup';
+import { useState } from "react";
 
-const ChartNav = ({ region, setRegion, market, setMarket, type, setType, dataHousing, dataRates }) => {
+const ChartNav = ({ region, setRegion, market, setMarket, type, setType, dataHousing, dataRates, setPickedOption}) => {
+	const [showOffcanvas, setShowOffcanvas] = useState(false);
+
 	const toUpper = (string) => {
 		return string.toUpperCase()
 	}
@@ -45,8 +50,18 @@ const ChartNav = ({ region, setRegion, market, setMarket, type, setType, dataHou
 		link.click()
 	}
 
+	const handleOpenOffcanvas = () => setShowOffcanvas(true);
+	const handleCloseOffcanvas = () => setShowOffcanvas(false);
+
+	const handleOptionPick = (e) => {
+		setPickedOption(e);
+	};
+
 return (
 	<Navbar bg="primary" data-bs-theme="dark" className="bg-body-tertiary">
+		<Button onClick={handleOpenOffcanvas} variant="dark" style={{marginLeft: "10px"}}>
+			<span className="navbar-toggler-icon"></span>
+		</Button>
 		<Container>
 			<Navbar.Brand>Ustawienia</Navbar.Brand>
 			<Nav className="me-auto">
@@ -96,6 +111,18 @@ return (
 				</Button>
 			</Nav>
 		</Container>
+		<Offcanvas bg="primary" data-bs-theme="dark" show={showOffcanvas} onHide={handleCloseOffcanvas}>
+			<Offcanvas.Header closeButton>
+				<Offcanvas.Title>Wybierz opcję</Offcanvas.Title>
+			</Offcanvas.Header>
+			<Offcanvas.Body>
+				<ListGroup onSelect={handleOptionPick}>
+					<ListGroup.Item action variant="light" eventKey="linearChart" className="text-center">Wykres cen mieszkań</ListGroup.Item>
+					<ListGroup.Item action variant="light" eventKey="percentageChart" className="text-center">Wykres procentowy cen mieszkań</ListGroup.Item>
+					<ListGroup.Item action variant="light" eventKey="barChart" className="text-center">Wykres słupkowy cen mieszkań</ListGroup.Item>
+				</ListGroup>
+			</Offcanvas.Body>
+		</Offcanvas>
 	</Navbar>
 );
 };

@@ -34,7 +34,7 @@ const ChartNav = ({ region, setRegion, market, setMarket, type, setType, dataHou
 	}
 
 	const handleExport = (eventkey) => {
-		var jsonString
+		let jsonString
 		if (eventkey == "housingData") {
 			jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
 				JSON.stringify(dataHousing)

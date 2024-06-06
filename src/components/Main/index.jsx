@@ -15,7 +15,7 @@ function Main() {
   const [region, setRegion] = useState("POLSKA");
   const [market, setMarket] = useState("rynek pierwotny");
   const [type, setType] = useState("do 40 m2");
-  const [pickedOption, setPickedOption] = useState("linearChart")
+  const [pickedOption, setPickedOption] = useState("linearChart");
 
   useEffect(() => {
     console.log(pickedOption)
@@ -132,36 +132,41 @@ function Main() {
   useEffect(() => {
     if (!isLoadingHousing && !isLoadingInterests) {
       const housingDates = housingData.map((d) => `${d.year}-01-01`);
-      const housingPrices = housingData.map((d) => d.price);
       const interestRateDates = ratesData.map((d) => {
         const [day, month, year] = d.date.split("-");
         return `${day}-${month}-${year}`;
       });
       const interestRates = ratesData.map((d) => d.refRate);
-
       const allDates = mergeDates(housingDates, interestRateDates);
-      const mappedHousingPrices = mapDataToDates(
-        allDates,
-        housingDates,
-        housingPrices,
-        true
-      );
       const mappedInterestRates = mapDataToDates(
         allDates,
         interestRateDates,
         interestRates
       );
 
-      let firstLabel = "Ceny mieszkań";
+      let firstLabel = "";
       let secondaryLabel = "";
       let isBothDataPicked = false;
       let secondaryHousingPrices = [];
       let mappedSecondaryHousingPrices = [];
 
       if(market == "oba rynki" && !isLoadingSecondaryHousing ){
+        isBothDataPicked = true;
+      }
+
+      let parsedData;
+      
+      if(pickedOption == "linearChart"){
+        const housingPrices = housingData.map((d) => d.price);
+        const mappedHousingPrices = mapDataToDates(
+          allDates,
+          housingDates,
+          housingPrices,
+          true
+        );
+
         firstLabel = "Ceny mieszkań - rynek pierwotny";
         secondaryLabel = "Ceny mieszkań - rynek wtórny";
-        isBothDataPicked = true;
         secondaryHousingPrices = secondaryHousingData.map((d) => d.price);
         mappedSecondaryHousingPrices = mapDataToDates(
           allDates,
@@ -169,11 +174,7 @@ function Main() {
           secondaryHousingPrices,
           true
         );
-      }
 
-      let parsedData;
-      
-      if(pickedOption == "linearChart"){
         parsedData = parseData(allDates, firstLabel, secondaryLabel, mappedHousingPrices, mappedSecondaryHousingPrices, mappedInterestRates, isBothDataPicked);
       }
 
@@ -186,7 +187,6 @@ function Main() {
         percentageChangeYearly.pop();
         secondPercentageChangeYearly.pop();
         
-        console.log(percentageChangeYearly)
         const mappedHousingPriceChanges = mapDataToDates(
           allDates,
           housingDates,

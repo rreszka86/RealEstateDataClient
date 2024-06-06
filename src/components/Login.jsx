@@ -91,10 +91,6 @@ function Login() {
 							/>
 							<span className="text-danger"></span>
 						</div>
-						<div className="mb-3 form-check">
-							<input type="checkbox" className="form-check-input" />
-							<label className="form-check-label">Zapamiętaj mnie</label>
-						</div>
 						<div className="mb-3">
 							<button
 								type="submit"
@@ -103,6 +99,9 @@ function Login() {
 							>
 								Zaloguj
 							</button>
+							<a className="btn btn-primary float-end" href="/register">
+								Przejdź do rejestracji
+							</a>
 						</div>
 					</form>
 				</div>

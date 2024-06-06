@@ -35,6 +35,7 @@ function App() {
           <AuthGuard onAuth={<Main />} onNotAuth={<Navigate to="/login" />} />
         }
       />
+      <Route path="*" element={<Navigate to="/main"/>} />
     </Routes>
   );
 }

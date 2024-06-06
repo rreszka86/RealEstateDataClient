@@ -8,6 +8,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import ListGroup from 'react-bootstrap/ListGroup';
 import { useState } from "react";
+import userService from "../../services/userService";
 
 const ChartNav = ({ region, setRegion, market, setMarket, type, setType, dataHousing, dataRates, pickedOption, setPickedOption, year, setYear, dataBarChart}) => {
 	const [showOffcanvas, setShowOffcanvas] = useState(false);
@@ -128,6 +129,7 @@ return (
 			</Nav>
 			}
 			<Nav>
+				{ userService.decodeToken(localStorage.getItem("jwtToken")).roles == "ADMIN" ?
 				<DropdownButton
 					size="md"
 					variant="outline-light"
@@ -138,6 +140,7 @@ return (
 					<Dropdown.Item eventKey="housingData" active={false} >Dane mieszkaniowe</Dropdown.Item>
 					{pickedOption != "barChart" ? <Dropdown.Item eventKey="ratesData" active={false}>Dane stóp procentowych</Dropdown.Item> : ""}
 				</DropdownButton>
+				: "" }
 				<Button variant="outline-light" onClick={handleLogout}>
 					Wyloguj się
 				</Button>

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { jwtDecode } from 'jwt-decode';
 
 export default class userService{
     static ipAddress = import.meta.env.VITE_API_SERVER_ADDRESS;
@@ -88,4 +89,9 @@ export default class userService{
           throw err;
         }
       };
+
+    static decodeToken = (token) => {
+        const decoded = jwtDecode(token);
+        return decoded;
+    }
 }

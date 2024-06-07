@@ -10,12 +10,15 @@ function Main() {
   const [secondaryHousingData, setSecondaryHousingData] = useState([]);
   const [ratesData, setRatesData] = useState([]);
   const [barChartData, setBarChartData] = useState([]);
+  const [barChartDataType, setBarChartDataType] = useState([]);
   const [chartData, setChartData] = useState(null);
   const [barChart, setBarChart] = useState(null);
+  const [barChartType, setBarChartType] = useState(null);
   const [isLoadingHousing, setIsLoadingHousing] = useState(true);
   const [isLoadingSecondaryHousing, setIsLoadingSecondaryHousing] = useState(true);
   const [isLoadingInterests, setIsLoadingInterests] = useState(true);
   const [isLoadingBarChartData, setIsLoadingBarChartData] = useState(true);
+  const [isLoadingBarChartDataType, setIsLoadingBarChartDataType] = useState(true);
   const [year, setYear] = useState(2013);
   const [region, setRegion] = useState("POLSKA");
   const [market, setMarket] = useState("rynek pierwotny");
@@ -47,6 +50,13 @@ function Main() {
         setIsLoadingBarChartData(false);
       });
   }, [year, type]);
+
+  useEffect(() => {
+      dataService.getHousingDataForTypeBarChart(region, market).then((data) => {
+        setBarChartDataType(data)
+        setIsLoadingBarChartDataType(false)
+      })
+  }, [region, market])
 
   useEffect(() => {
     dataService.getRatesData().then((data) => {
@@ -148,6 +158,39 @@ function Main() {
     }
   }
 
+  const parseBarDataType = (labels, lowData, midData, higherData, highestData) => {
+    return {
+      labels: labels,
+      datasets:
+      [
+        {
+          label: "do 40 m2",
+          data: lowData,
+          backgroundColor: 'rgba(153, 102, 255, 0.2)',
+          borderColor: 'rgba(153, 102, 255, 0.2)',
+        },
+        {
+          label: "od 40,1 do 60 m2",
+          data: midData,
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 0.2)',
+        },
+        {
+          label: "od 60,1 do 80 m2",
+          data: higherData,
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 0.2)',
+        },
+        {
+          label: "od 80,1 m2",
+          data: highestData,
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 0.2)',
+        }
+      ]
+    }
+  }
+
   const calculatePercentageChange = (data) =>{
     return data.map((current, index, array) => {
     if (index === 0) return null;
@@ -233,7 +276,7 @@ function Main() {
         parsedData = parseData(allDates, firstLabel, secondaryLabel, mappedHousingPriceChanges, mappedSecondaryHousingPriceChanges, mappedInterestRates, isBothDataPicked);
       }
 
-      if(pickedOption != "barChart"){
+      if(pickedOption != "barChart" && pickedOption != "barChartType"){
         parsedData.labels.pop();
         parsedData.datasets[0].data.pop();
         setChartData(parsedData);
@@ -249,12 +292,37 @@ function Main() {
           const parsedData = parseBarData(labels, primatyMarketData, afterMarketData);
           setBarChart(parsedData);
         }
-        
-
     }
-  }, [isLoadingHousing, isLoadingSecondaryHousing, isLoadingBarChartData, isLoadingInterests, barChartData, housingData, ratesData, pickedOption]);
 
+    if(!isLoadingBarChartDataType){
+      const lowData = barChartDataType.filter((d) => d.surface == "do 40 m2")
+      const midData = barChartDataType.filter((d) => d.surface == "od 40,1 do 60 m2")
+      const higherData = barChartDataType.filter((d) => d.surface == "od 60,1 do 80 m2")
+      const highestData = barChartDataType.filter((d) => d.surface == "od 80,1 m2")
+      lowData.pop()
+      midData.pop()
+      higherData.pop()
+      highestData.pop()
 
+      const labels = lowData.map((d) => d.year)
+
+      const lowDataPrice = lowData.map((d) => d.price)
+      const midDataPrice = midData.map((d) => d.price)
+      const higherDataPrice = higherData.map((d) => d.price)
+      const highestDataPrice = highestData.map((d) => d.price)
+      
+      if(labels && lowDataPrice && midDataPrice && higherDataPrice && highestDataPrice){
+        const parsedData = parseBarDataType(labels, lowDataPrice, midDataPrice, higherDataPrice, highestDataPrice)
+        setBarChartType(parsedData)
+      }
+  }
+  }, [isLoadingHousing, isLoadingSecondaryHousing, isLoadingBarChartData, isLoadingInterests, isLoadingBarChartDataType, barChartData, barChartDataType,housingData, ratesData, pickedOption]);
+
+  useEffect(() => {
+    if(pickedOption == "barChartType" && market == "oba rynki"){
+      setMarket("rynek pierwotny")
+    }
+  }, [pickedOption])
 
   return (
     <div>
@@ -277,6 +345,7 @@ function Main() {
         <div className="chartBox">
           {chartData && (pickedOption == "linearChart" || pickedOption == "percentageChart") ? <LinearChart chartData={chartData} optionsSet={pickedOption}/> : <p></p>}
           {barChartData && pickedOption == "barChart" ? <BarChart chartData={barChart} optionsSet={pickedOption}/> : <p></p>}
+          {barChartDataType && pickedOption == "barChartType" ? <BarChart chartData={barChartType} optionsSet={pickedOption}/> : <p></p>}
         </div>
       </div>
     </div>

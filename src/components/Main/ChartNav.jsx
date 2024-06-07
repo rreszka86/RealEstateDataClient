@@ -75,7 +75,7 @@ return (
 		</Button>
 		<Container>
 			<Navbar.Brand>Ustawienia</Navbar.Brand>
-			{pickedOption != "barChart" ? 
+			{pickedOption != "barChart"? 
 			<Nav className="me-auto">
 				<NavDropdown title={"Region: " + region} onSelect={handleRegionPick}>
 					<NavDropdown.Item eventKey="POLSKA">POLSKA</NavDropdown.Item>
@@ -98,14 +98,18 @@ return (
 				<NavDropdown title={"Rynek: " + toUpper(market)} onSelect={handleMarketPick}>
 					<NavDropdown.Item eventKey="rynek pierwotny">RYNEK PIERWOTNY</NavDropdown.Item>
 					<NavDropdown.Item eventKey="rynek wtórny">RYNEK WTÓRNY</NavDropdown.Item>
+					{pickedOption != "barChartType"?
 					<NavDropdown.Item eventKey="oba rynki">OBA RYNKI</NavDropdown.Item>
+					: <span></span>}	
 				</NavDropdown>
+				{pickedOption != "barChartType" ?
 				<NavDropdown title={"Typ: " + toUpper(type)} onSelect={handleTypePick}>
 					<NavDropdown.Item eventKey="do 40 m2">DO 40 M2</NavDropdown.Item>
 					<NavDropdown.Item eventKey="od 40,1 do 60 m2">OD 40,1 DO 60 M2</NavDropdown.Item>
 					<NavDropdown.Item eventKey="od 60,1 do 80 m2">OD 60,1 DO 80 M2</NavDropdown.Item>
 					<NavDropdown.Item eventKey="od 80,1 m2">OD 80,1 M2</NavDropdown.Item>
 				</NavDropdown>
+				 : <p></p>}
 			</Nav> : 
 			<Nav className="me-auto">
 				<NavDropdown title={"Rok: " + year} onSelect={handleYearPick}>
@@ -155,6 +159,7 @@ return (
 					<ListGroup.Item action variant="light" eventKey="linearChart" className="text-center">Wykres cen mieszkań</ListGroup.Item>
 					<ListGroup.Item action variant="light" eventKey="percentageChart" className="text-center">Wykres procentowy cen mieszkań</ListGroup.Item>
 					<ListGroup.Item action variant="light" eventKey="barChart" className="text-center">Wykres słupkowy cen mieszkań</ListGroup.Item>
+					<ListGroup.Item action variant="light" eventKey="barChartType" className="text-center">Wykres słupkowy cen mieszkań z podziałem</ListGroup.Item>
 				</ListGroup>
 			</Offcanvas.Body>
 		</Offcanvas>

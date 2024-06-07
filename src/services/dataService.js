@@ -32,6 +32,20 @@ export default class dataService {
         }
     };
 
+    static getHousingDataForTypeBarChart = async (name, market) => {
+        try {
+            const res = await axios.get(
+                `${this.ipAddress}/api/housingPrices/?name=${name}&transaction=${market}`,
+                {
+                    headers: { Authorization: `Bearer ${this.token}` },
+                } 
+            );
+            return res.data
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     static getRatesData = async () => {
         try {
             const res = await axios.get(

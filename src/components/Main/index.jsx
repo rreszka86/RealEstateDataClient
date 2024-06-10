@@ -29,11 +29,11 @@ function Main() {
     if(market == "oba rynki"){
       dataService.getHousingData(region, "rynek pierwotny", type).then((data) => {
         setHousingData(data);
-        setIsLoadingSecondaryHousing(false);
+        setIsLoadingHousing(false);
       });
       dataService.getHousingData(region, "rynek wtórny", type).then((data) => {
         setSecondaryHousingData(data);
-        setIsLoadingHousing(false);
+        setIsLoadingSecondaryHousing(false);
       });
     } else {
     dataService.getHousingData(region, market, type).then((data) => {
@@ -201,122 +201,146 @@ function Main() {
   });
 }
 
-  useEffect(() => {
-    if (!isLoadingHousing && !isLoadingInterests && pickedOption != "barChart") {
-      const housingDates = housingData.map((d) => `${d.year}-01-01`);
-      const interestRateDates = ratesData.map((d) => {
-        const [day, month, year] = d.date.split("-");
-        return `${day}-${month}-${year}`;
-      });
-      const interestRates = ratesData.map((d) => d.refRate);
-      const allDates = mergeDates(housingDates, interestRateDates);
-      const mappedInterestRates = mapDataToDates(
+useEffect(() => {
+  if (!isLoadingHousing && !isLoadingInterests && pickedOption !== "barChart") {
+    const housingDates = housingData.map((d) => `${d.year}-01-01`);
+    const interestRateDates = ratesData.map((d) => {
+      const [day, month, year] = d.date.split("-");
+      return `${day}-${month}-${year}`;
+    });
+    const interestRates = ratesData.map((d) => d.refRate);
+    const allDates = mergeDates(housingDates, interestRateDates);
+    const mappedInterestRates = mapDataToDates(
+      allDates,
+      interestRateDates,
+      interestRates
+    );
+
+    let firstLabel = "";
+    let secondaryLabel = "";
+    let isBothDataPicked = market === "oba rynki";
+    let secondaryHousingPrices = [];
+    let mappedSecondaryHousingPrices = [];
+    let parsedData;
+
+    if (pickedOption === "linearChart") {
+      const housingPrices = housingData.map((d) => d.price);
+      const mappedHousingPrices = mapDataToDates(
         allDates,
-        interestRateDates,
-        interestRates
+        housingDates,
+        housingPrices,
+        true
       );
 
-      let firstLabel = "";
-      let secondaryLabel = "";
-      let isBothDataPicked = false;
-      let secondaryHousingPrices = [];
-      let mappedSecondaryHousingPrices = [];
+      firstLabel = "Ceny mieszkań - rynek pierwotny";
+      secondaryLabel = "Ceny mieszkań - rynek wtórny";
+      secondaryHousingPrices = secondaryHousingData.map((d) => d.price);
+      mappedSecondaryHousingPrices = mapDataToDates(
+        allDates,
+        housingDates,
+        secondaryHousingPrices,
+        true
+      );
 
-      if(market == "oba rynki" && !isLoadingSecondaryHousing ){
-        isBothDataPicked = true;
-      }
-
-      let parsedData;
-      
-      if(pickedOption == "linearChart"){
-        const housingPrices = housingData.map((d) => d.price);
-        const mappedHousingPrices = mapDataToDates(
-          allDates,
-          housingDates,
-          housingPrices,
-          true
-        );
-
-        firstLabel = "Ceny mieszkań - rynek pierwotny";
-        secondaryLabel = "Ceny mieszkań - rynek wtórny";
-        secondaryHousingPrices = secondaryHousingData.map((d) => d.price);
-        mappedSecondaryHousingPrices = mapDataToDates(
-          allDates,
-          housingDates,
-          secondaryHousingPrices,
-          true
-        );
-
-        parsedData = parseData(allDates, firstLabel, secondaryLabel, mappedHousingPrices, mappedSecondaryHousingPrices, mappedInterestRates, isBothDataPicked);
-      }
-
-      if(pickedOption == "percentageChart"){
-        firstLabel = "Zmiany procentowe - rynek pierwotny";
-        secondaryLabel = "Zmiany procentowe - rynek wtórny";
-        const percentageChangeYearly = calculatePercentageChange(housingData);
-        const secondPercentageChangeYearly = calculatePercentageChange(secondaryHousingData);
-
-        percentageChangeYearly.pop();
-        secondPercentageChangeYearly.pop();
-        
-        const mappedHousingPriceChanges = mapDataToDates(
-          allDates,
-          housingDates,
-          percentageChangeYearly,
-          true
-        );
-
-        const mappedSecondaryHousingPriceChanges = mapDataToDates(
-          allDates,
-          housingDates,
-          secondPercentageChangeYearly,
-          true
-        );
-
-        parsedData = parseData(allDates, firstLabel, secondaryLabel, mappedHousingPriceChanges, mappedSecondaryHousingPriceChanges, mappedInterestRates, isBothDataPicked);
-      }
-
-      if(pickedOption != "barChart" && pickedOption != "barChartType"){
-        parsedData.labels.pop();
-        parsedData.datasets[0].data.pop();
-        setChartData(parsedData);
-      } 
-    }
-    if(!isLoadingBarChartData){
-        const primaryMarket = barChartData.filter((d) => d.transaction == "rynek pierwotny")
-        const afterMarket = barChartData.filter((d) => d.transaction == "rynek wtórny")
-        const labels = primaryMarket.map((d) => d.name)
-        const primatyMarketData = primaryMarket.map((d) => d.price)
-        const afterMarketData = afterMarket.map((d) => d.price)
-        if(labels && primatyMarketData && afterMarketData){     
-          const parsedData = parseBarData(labels, primatyMarketData, afterMarketData);
-          setBarChart(parsedData);
-        }
+      parsedData = parseData(
+        allDates,
+        firstLabel,
+        secondaryLabel,
+        mappedHousingPrices,
+        mappedSecondaryHousingPrices,
+        mappedInterestRates,
+        isBothDataPicked
+      );
     }
 
-    if(!isLoadingBarChartDataType){
-      const lowData = barChartDataType.filter((d) => d.surface == "do 40 m2")
-      const midData = barChartDataType.filter((d) => d.surface == "od 40,1 do 60 m2")
-      const higherData = barChartDataType.filter((d) => d.surface == "od 60,1 do 80 m2")
-      const highestData = barChartDataType.filter((d) => d.surface == "od 80,1 m2")
-      lowData.pop()
-      midData.pop()
-      higherData.pop()
-      highestData.pop()
+    if (pickedOption === "percentageChart") {
+      firstLabel = "Zmiany procentowe - rynek pierwotny";
+      secondaryLabel = "Zmiany procentowe - rynek wtórny";
+      const percentageChangeYearly = calculatePercentageChange(housingData);
+      const secondPercentageChangeYearly = calculatePercentageChange(secondaryHousingData);
 
-      const labels = lowData.map((d) => d.year)
+      percentageChangeYearly.pop();
+      secondPercentageChangeYearly.pop();
 
-      const lowDataPrice = lowData.map((d) => d.price)
-      const midDataPrice = midData.map((d) => d.price)
-      const higherDataPrice = higherData.map((d) => d.price)
-      const highestDataPrice = highestData.map((d) => d.price)
-      
-      if(labels && lowDataPrice && midDataPrice && higherDataPrice && highestDataPrice){
-        const parsedData = parseBarDataType(labels, lowDataPrice, midDataPrice, higherDataPrice, highestDataPrice)
-        setBarChartType(parsedData)
-      }
+      const mappedHousingPriceChanges = mapDataToDates(
+        allDates,
+        housingDates,
+        percentageChangeYearly,
+        true
+      );
+
+      const mappedSecondaryHousingPriceChanges = mapDataToDates(
+        allDates,
+        housingDates,
+        secondPercentageChangeYearly,
+        true
+      );
+
+      parsedData = parseData(
+        allDates,
+        firstLabel,
+        secondaryLabel,
+        mappedHousingPriceChanges,
+        mappedSecondaryHousingPriceChanges,
+        mappedInterestRates,
+        isBothDataPicked
+      );
+    }
+
+    if (pickedOption !== "barChart" && pickedOption !== "barChartType") {
+      parsedData.labels.pop();
+      parsedData.datasets[0].data.pop();
+      setChartData(parsedData);
+    }
   }
-  }, [isLoadingHousing, isLoadingSecondaryHousing, isLoadingBarChartData, isLoadingInterests, isLoadingBarChartDataType, barChartData, barChartDataType,housingData, ratesData, pickedOption]);
+
+  if (!isLoadingBarChartData) {
+    const primaryMarket = barChartData.filter((d) => d.transaction === "rynek pierwotny");
+    const afterMarket = barChartData.filter((d) => d.transaction === "rynek wtórny");
+    const labels = primaryMarket.map((d) => d.name);
+    const primatyMarketData = primaryMarket.map((d) => d.price);
+    const afterMarketData = afterMarket.map((d) => d.price);
+    
+    if (labels && primatyMarketData && afterMarketData) {
+      const parsedData = parseBarData(labels, primatyMarketData, afterMarketData);
+      setBarChart(parsedData);
+    }
+  }
+
+  if (!isLoadingBarChartDataType) {
+    const lowData = barChartDataType.filter((d) => d.surface === "do 40 m2");
+    const midData = barChartDataType.filter((d) => d.surface === "od 40,1 do 60 m2");
+    const higherData = barChartDataType.filter((d) => d.surface === "od 60,1 do 80 m2");
+    const highestData = barChartDataType.filter((d) => d.surface === "od 80,1 m2");
+    lowData.pop();
+    midData.pop();
+    higherData.pop();
+    highestData.pop();
+
+    const labels = lowData.map((d) => d.year);
+    const lowDataPrice = lowData.map((d) => d.price);
+    const midDataPrice = midData.map((d) => d.price);
+    const higherDataPrice = higherData.map((d) => d.price);
+    const highestDataPrice = highestData.map((d) => d.price);
+
+    if (labels && lowDataPrice && midDataPrice && higherDataPrice && highestDataPrice) {
+      const parsedData = parseBarDataType(labels, lowDataPrice, midDataPrice, higherDataPrice, highestDataPrice);
+      setBarChartType(parsedData);
+    }
+  }
+}, [
+  isLoadingHousing,
+  isLoadingSecondaryHousing,
+  isLoadingBarChartData,
+  isLoadingInterests,
+  isLoadingBarChartDataType,
+  barChartData,
+  barChartDataType,
+  housingData,
+  ratesData,
+  pickedOption
+]);
+
 
   useEffect(() => {
     if(pickedOption == "barChartType" && market == "oba rynki"){
@@ -337,6 +361,7 @@ function Main() {
         setType={setType}
         dataHousing={housingData}
         dataBarChart={barChartData}
+        dataBarChartType={barChartDataType}
         dataRates={ratesData}
         pickedOption={pickedOption}
         setPickedOption={setPickedOption}
